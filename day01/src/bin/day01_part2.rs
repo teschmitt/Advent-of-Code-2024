@@ -23,6 +23,7 @@ impl LocationListPair {
     }
 
     fn similarity_sum(&self) -> u64 {
+        // to optimize for execution speed, build a loopup table of known counts and query that before filtering repeatedly
         self.left
             .iter()
             .map(|elem| elem * self.right.iter().filter(|&x| x == elem).count() as u64)
