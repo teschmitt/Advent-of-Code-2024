@@ -35,10 +35,6 @@ impl LocationListPair {
 
 fn main() -> Result<()> {
     let data = get_input_file_as_string()?;
-    let mut list_pair = LocationListPair {
-        left: vec![],
-        right: vec![],
-    };
 
     /* ---------------------------------------- parsers ---------------------------------------- */
     let get_pair = separated_pair(get_u64, multispace1, get_u64);
@@ -47,7 +43,13 @@ fn main() -> Result<()> {
 
     let vec_of_pairs = get_all_pairs(&data.as_str()).unwrap().1;
 
+    let cap = vec_of_pairs.len();
+    let mut list_pair = LocationListPair {
+        left: Vec::with_capacity(cap),
+        right: Vec::with_capacity(cap),
+    };
     list_pair.ingest(vec_of_pairs);
+
     dbg!(list_pair.distance());
     Ok(())
 }
