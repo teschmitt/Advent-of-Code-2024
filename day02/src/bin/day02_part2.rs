@@ -19,17 +19,39 @@ impl From<&Vec<u32>> for ReportResult {
         if report.len() <= 1 {
             return ReportResult::Safe;
         }
-        if !(report.iter().is_sorted() || report.iter().rev().is_sorted()) {
-            return ReportResult::Unsafe;
+
+        let mut asc: Option<bool> = None;
+        let mut skipped = false;
+        let mut idx = 0;
+        let mut next_idx = 1;
+        while next_idx < report.len() {
+            let diff = report[next_idx] as i32 - report[idx] as i32;
+            if diff.abs() > 0 && diff.abs() < 4 {
+                if asc.is_none() || ((diff > 0) == asc.unwrap()) {
+                    asc = Some(diff > 0);
+                    idx = next_idx;
+                    next_idx += 1;
+                    continue;
+                }
+                // change in direction
+                else if !skipped {
+                    skipped = true;
+                    idx -= 1;
+                    continue;
+                } else {
+                    return ReportResult::Unsafe;
+                }
+            }
+            // two elements are equal
+            else if !skipped {
+                skipped = true;
+                next_idx += 1;
+                continue;
+            } else {
+                return ReportResult::Unsafe;
+            }
         }
 
-        if report
-            .iter()
-            .map_windows(|[&x, &y]| 0 < x.abs_diff(y) && x.abs_diff(y) < 4)
-            .any(|b| !b)
-        {
-            return ReportResult::Unsafe;
-        }
         ReportResult::Safe
     }
 }
@@ -46,19 +68,9 @@ fn main() -> Result<()> {
     let mut res = 0;
     for report in &get_all_reports(&data).unwrap().1 {
         let r_res: ReportResult = report.into();
+        // println!("{report:?} -> {r_res:?}");
         if r_res == ReportResult::Safe {
             res += 1;
-            continue;
-        } else {
-            for idx in 0..report.len() {
-                let mut red_report = report.clone();
-                red_report.remove(idx);
-                let r_res: ReportResult = (&red_report).into();
-                if r_res == ReportResult::Safe {
-                    res += 1;
-                    break;
-                }
-            }
         }
     }
 

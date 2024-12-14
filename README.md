@@ -1,6 +1,6 @@
-# Advent of Code 2023
+# Advent of Code 2024
 
-These are my modest Rust contributions to the Advent of Code 2023.
+These are my modest Rust contributions to the Advent of Code 2024.
 
 ## How to start a new puzzle
 
