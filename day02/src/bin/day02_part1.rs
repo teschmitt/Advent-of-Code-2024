@@ -15,8 +15,8 @@ enum ReportResult {
     Unsafe,
 }
 
-impl From<Report> for ReportResult {
-    fn from(report: Report) -> Self {
+impl From<&Report> for ReportResult {
+    fn from(report: &Report) -> Self {
         if report.len() <= 1 {
             return ReportResult::Safe;
         }
@@ -47,7 +47,7 @@ fn main() -> Result<()> {
         .unwrap()
         .1
         .iter()
-        .map(|r| r.clone().into())
+        .map(|r| r.into())
         .filter(|res: &ReportResult| res == &ReportResult::Safe)
         .count();
     dbg!(res);
