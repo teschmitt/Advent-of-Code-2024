@@ -2,6 +2,12 @@
 
 nr=$1
 day="day${nr}"
+
+if [ -d "$day" ]; then
+  echo "Directory '$day' already exists."
+  exit 1
+fi
+
 cp -r ./template "./$day"
 cd "./$day"
 sed -i '' "s|testday|$day|g" Cargo.toml

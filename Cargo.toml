@@ -10,3 +10,6 @@ anyhow = "1.0.75"
 gcd = "2.3.0"
 nom = "7.1.3"
 utils = { path = "utils" }
+
+[toolchain]
+channel = "nightly"

@@ -43,7 +43,7 @@ pub fn get_path_from_args() -> Result<PathBuf> {
 }
 
 pub fn get_u64(input: &str) -> IResult<&str, u64> {
-    map_res(recognize(digit1), str::parse)(input)
+    get_num::<u64>(input)
 }
 
 pub fn get_num<NUM: FromStr>(input: &str) -> IResult<&str, NUM> {
