@@ -6,8 +6,26 @@ use nom::{
 use utils::get_input_file_as_string;
 use utils::get_num;
 
-fn is_safe(report: &Vec<u32>, skipped: bool, mut asc: Option<bool>) -> bool {
-    // println!("Checking {report:?}");
+fn skipped_is_safe(report: &[u32], idx: usize, skipped: bool) -> bool {
+    if skipped {
+        return false;
+    };
+    (idx.saturating_sub(1)..=idx + 1).any(|ix| {
+        // let mut skipped_report = report.clone();
+        // skipped_report.remove(ix);
+        is_safe(
+            &report
+                .iter()
+                .enumerate()
+                .filter_map(|(i, &x)| if i == ix { None } else { Some(x) })
+                .collect::<Vec<_>>(),
+            true,
+            None,
+        )
+    })
+}
+
+fn is_safe(report: &[u32], skipped: bool, mut asc: Option<bool>) -> bool {
     if report.len() <= 1 {
         return true;
     }
@@ -18,33 +36,13 @@ fn is_safe(report: &Vec<u32>, skipped: bool, mut asc: Option<bool>) -> bool {
         let diff = report[idx + 1] as i32 - report[idx] as i32;
 
         if asc.is_some() && asc.unwrap() != (diff > 0) {
-            if !skipped {
-                let mut skipped_res = vec![];
-                for i in idx.saturating_sub(1)..=(idx + 1) {
-                    let mut skipped_report = report.clone();
-                    skipped_report.remove(i);
-                    skipped_res.push(is_safe(&skipped_report, true, None));
-                }
-                return skipped_res.iter().any(|&b| b);
-            } else {
-                return false;
-            }
+            return skipped_is_safe(report, idx, skipped);
         }
 
         asc = Some(diff > 0);
 
         if diff.abs() == 0 || diff.abs() > 3 {
-            if !skipped {
-                let mut skipped_res = vec![];
-                for i in idx.saturating_sub(1)..=(idx + 1) {
-                    let mut skipped_report = report.clone();
-                    skipped_report.remove(i);
-                    skipped_res.push(is_safe(&skipped_report, true, asc));
-                }
-                return skipped_res.iter().any(|&b| b);
-            } else {
-                return false;
-            }
+            return skipped_is_safe(report, idx, skipped);
         }
 
         idx += 1;
@@ -64,12 +62,8 @@ fn main() -> Result<()> {
     let mut res = 0;
     for report in &get_all_reports(&data).unwrap().1 {
         let r_res = is_safe(report, false, None);
-        // println!("{report:?} -> {r_res:?}");
         if r_res {
             res += 1;
-            // dbg!(res);
-        } else {
-            println!("{report:?} -> {r_res:?}");
         }
     }
 
